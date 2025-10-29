@@ -2,7 +2,7 @@
 <html lang="vi">
 <head>
   <meta charset="UTF-8">
-  <title>Quiz</title>
+  <title>Quiz - Địa điểm</title>
   <style>
     body {
       font-family: "Arial", sans-serif;
@@ -13,7 +13,7 @@
     }
 
     .quiz-container {
-      max-width: 800px;
+      max-width: 900px;
       margin: 0 auto;
       background: #fff;
       padding: 25px;
@@ -35,25 +35,22 @@
       text-align: center;
     }
 
-    h3 {
-      margin: 20px 0 10px;
-      color: #444;
-    }
-
     .answers {
       list-style: none;
       padding: 0;
       margin: 0 0 25px 0;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px 40px;
     }
 
     .answers li {
-      margin-bottom: 10px;
       display: flex;
       align-items: flex-start;
       gap: 10px;
     }
 
-    .answers input[type="checkbox"] {
+    .answers input[type="radio"] {
       width: 20px;
       height: 20px;
       cursor: pointer;
@@ -82,6 +79,84 @@
       background: #218838;
     }
 
+    /* --- Ô “Gợi ý” --- */
+    .hint-box {
+      text-align: center;
+      border: 2px solid #ccc;
+      border-radius: 8px;
+      padding: 12px 0;
+      width: 260px;
+      margin: 15px auto 25px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    .hint-box:hover {
+      background: #f5f5f5;
+    }
+
+    .hint-title {
+      font-weight: bold;
+      color: #222;
+      font-size: 17px;
+    }
+
+    .hint-note {
+      font-size: 13px;
+      color: #888;
+      margin-top: 4px;
+    }
+
+    /* --- Popup Gợi ý --- */
+    #hint-popup {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.6);
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+      animation: fadeIn 0.3s ease;
+    }
+
+    #hint-popup .popup-content {
+      position: relative;
+      background: #fff;
+      padding: 15px;
+      border-radius: 10px;
+      max-width: 600px;
+      width: 90%;
+      text-align: center;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    }
+
+    #hint-popup img {
+      max-width: 100%;
+      border-radius: 10px;
+    }
+
+    #hint-popup .popup-close {
+      position: absolute;
+      top: 5px;
+      right: 10px;
+      font-size: 22px;
+      color: #333;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    #hint-popup .popup-close:hover {
+      color: red;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
     /* --- Kết quả --- */
     #result-img {
       display: none;
@@ -96,7 +171,7 @@
       box-shadow: 0 8px 20px rgba(0,0,0,0.2);
     }
 
-    /* --- Popup Box-up chung --- */
+    /* --- Popup Sai --- */
     .popup {
       display: none;
       position: fixed;
@@ -108,6 +183,7 @@
       justify-content: center;
       align-items: center;
       z-index: 9999;
+      animation: fadeIn 0.3s ease;
     }
 
     .popup-content {
@@ -117,8 +193,8 @@
       border-radius: 10px;
       max-width: 500px;
       width: 90%;
-      box-shadow: 0 5px 15px rgba(0,0,0,0.3);
       text-align: center;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.3);
     }
 
     .popup-close {
@@ -144,9 +220,20 @@
 <body>
   <div class="quiz-container" id="quiz"></div>
 
-  <!-- Nút gợi ý (chỉ hiện ở câu 1) -->
-  <div id="hintButtonContainer" style="display:none;">
-    <button onclick="openHint()">💡 Gợi ý</button>
+  <!-- Popup báo sai -->
+  <div class="popup" id="popup">
+    <div class="popup-content">
+      <span class="popup-close" onclick="closePopup()">×</span>
+      <img src="https://raw.githubusercontent.com/designdaovn/Consotuthan_Nhiemvu3/refs/heads/main/khichondaansai.png" alt="Sai rồi">
+    </div>
+  </div>
+
+  <!-- Popup Gợi ý -->
+  <div id="hint-popup">
+    <div class="popup-content">
+      <span class="popup-close" onclick="closeHint()">×</span>
+      <img src="https://raw.githubusercontent.com/designdaovn/Consotuthan_Nhiemvu3/refs/heads/main/goi%20y%203.jpg" alt="Gợi ý">
+    </div>
   </div>
 
   <!-- Kết quả -->
@@ -154,153 +241,51 @@
     <img id="result-image" src="" alt="Kết quả">
   </div>
 
-  <!-- Popup khi sai -->
-  <div class="popup" id="popup">
-    <div class="popup-content">
-      <span class="popup-close" onclick="closePopup()">×</span>
-      <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c0/No_Cross_Circle.svg/240px-No_Cross_Circle.svg.png" alt="Sai rồi">
-    </div>
-  </div>
-
-  <!-- Popup gợi ý -->
-  <div class="popup" id="hintPopup">
-    <div class="popup-content">
-      <span class="popup-close" onclick="closeHint()">×</span>
-      <img src="https://i.imgur.com/0DElr0H.jpeg" alt="Gợi ý"> <!-- Thay link ảnh gợi ý ở đây -->
-    </div>
-  </div>
-
   <script>
-    // Danh sách câu hỏi
-    const questions = [
-      {
-        text: "Những vật chứng khiến bạn nghi ngờ hung thủ?",
-        subtitle: "Hãy chọn những vật chứng, tài liệu, hình ảnh mà khiến bạn nghi ngờ hung thủ của vụ án",
-        groups: [
-          {
-            title: "a. Tài liệu, giấy tờ của vụ án",
-            answers: [
-              "Báo cáo vụ án",
-              "Câu hỏi về nạn nhân",
-              "Lời khai nhân chứng: Nguyễn Văn Hải",
-              "Lời khai nhân chứng: Nguyễn Thị Lan",
-              "Lời khai nhân chứng: Nguyễn Nhật Linh",
-              "Lời khai nghi phạm: Nguyễn Ngọc",
-              "Lời khai nghi phạm: Vũ Hải Yến",
-              "Lời khai nghi phạm: Trần Minh Tiến",
-              "Lời khai nghi phạm: Lại Vũ Bình",
-              "Ảnh hiện trường",
-              "Giám định mẫu vật: Con dao",
-              "Giám định mẫu vật: Dấu giày",
-              "Giám định mẫu vật: Chai Rượu",
-              "Danh sách cuộc gọi cuối của nạn nhân",
-              "Thư tay của người ẩn danh",
-              "Thông tin người có liên quan: Nguyễn Ngọc",
-              "Thông tin người có liên quan: Trần Minh Tiến",
-              "Thông tin người có liên quan: Vũ Hải Yến",
-              "Thông tin người có liên quan: Lại Vũ Bình"
-            ],
-            correct: [13,14,18]
-          },
-          {
-            title: "b. Ảnh vụ án",
-            answers: [
-              "Ảnh Nhân vật",
-              "Ảnh hiện trường",
-              "Ảnh người ẩn danh cung cấp"
-            ],
-            correct: [0,2]
-          }
-        ],
-        next: 1,
-        hasHint: true
-      },
-      {
-        text: "Câu hỏi 2: Ai là Hung thủ đã giết chết nạn nhân?",
-        subtitle: "Hãy chọn người đang nghi nhất",
-        groups: [
-          {
-            title: "",
-            answers: [
-              "Nguyễn Ngọc",
-              "Vũ Hải Yến",
-              "Trần Minh Tiến",
-              "Lại Vũ Bình",
-              "Ninh Quang Long"
-            ],
-            correct: [4]
-          }
-        ],
-        imageLink: "https://github.com/designdaovn/Hosomat-acgiaacbao/raw/main/Gi%E1%BA%A3i%20th%C3%ADch%20m%E1%BB%A5c%20ti%C3%AAu%201.jpeg",
-        hasHint: false
-      }
-    ];
+    const question = {
+      text: "Hãy xác định địa điểm mà Vũ Đình Long muốn đưa Trịnh Quỳnh Châu đến",
+      subtitle: "Chọn địa điểm bạn cho là chính xác.",
+      answers: [
+        "Trung tâm thương mại DMark","Tòa Nhà Time Square","Khu đô thị Nam Bắc Hải","Công ty điện thoại Dtel","Quán D’Coffee",
+        "Bảo tàng quân sự","Cây cầu thời đại","Khu đô thị xanh Bắc Ái","Hiệu thuốc DPharma","Cánh đồng điện gió",
+        "Trường quốc tế DSchool","Khu tập thể viên chức quận","Trường tiểu học Bắc Hải","Tòa nhà DCapital","Công viên Quận Bắc Hải",
+        "Quán của Van’s","Tòa nhà thời đại","Tòa soạn báo DNews","Nhà thờ Bắc Hải","Nhà hàng Fletcher’s",
+        "Trung Tâm hành chính Quận","Khu đổi gió","Toa tàu Ký ức","Tiệm cắt tóc L’Sharp","Bưu điện Quận Bắc Hải",
+        "Chung cư Thiên An","Khu công nghiệp Tây Bắc Hải","Bãi rác Quận","Trạm xăng Chữ Tín","Sân bowling Dillard",
+        "Quán ăn góc phố Nhỏ","Tiệm thịt DMeet","Cửa hàng đồ câu","Cửa hàng tạp hóa","Tiệm kim hoàn 4T","Khu công nghiệp Bắc Hải"
+      ],
+      correct: [9],
+      resultImage: "https://raw.githubusercontent.com/designdaovn/Consotuthan_Nhiemvu3/refs/heads/main/Giai%20thich%20copy.jpg"
+    };
 
-    let current = 0;
-
-    function loadQuestion(index) {
-      const q = questions[index];
-      const container = document.getElementById("quiz");
-
-      let groupsHtml = q.groups.map((group, gIndex) => `
-        <h3>${group.title}</h3>
-        <ul class="answers" id="group${gIndex}">
-          ${group.answers.map((a, i) => `
-            <li>
-              <input type="checkbox" value="${i}" id="g${gIndex}a${i}">
-              <label for="g${gIndex}a${i}">${a}</label>
-            </li>`).join("")}
-        </ul>
-      `).join("");
-
+    function loadQuestion() {
+      const container = document.getElementById('quiz');
       container.innerHTML = `
-        <h2>${q.text}</h2>
-        <div class="subtitle">${q.subtitle || ""}</div>
-        ${groupsHtml}
-        <button onclick="checkAnswers()">Kiểm tra đáp án</button>
-      `;
+        <h2>${question.text}</h2>
+        <div class="subtitle">${question.subtitle}</div>
+        <ul class="answers" id="answers">
+          ${question.answers.map((a, i) => `
+            <li><input type="radio" name="answer" value="${i}" id="a${i}">
+            <label for="a${i}">${String(i+1).padStart(2,'0')}. ${a}</label></li>
+          `).join('')}
+        </ul>
+        <button onclick="checkAnswer()">Kiểm tra đáp án</button>
 
-      // Hiện/ẩn nút gợi ý
-      if (q.hasHint) {
-        document.getElementById('hintButtonContainer').style.display = 'block';
-      } else {
-        document.getElementById('hintButtonContainer').style.display = 'none';
-      }
+        <div class="hint-box" onclick="openHint()">
+          <div class="hint-title">Gợi ý</div>
+          <div class="hint-note">(chỉ sử dụng gợi ý khi đã rất bế tắc)</div>
+        </div>
+      `;
     }
 
-    function checkAnswers() {
-      const q = questions[current];
-      let allCorrect = true;
-
-      q.groups.forEach((group, gIndex) => {
-        let selected = [];
-        document.querySelectorAll(`#group${gIndex} input[type="checkbox"]:checked`).forEach(cb => {
-          selected.push(parseInt(cb.value));
-        });
-
-        if (selected.length !== group.correct.length) {
-          allCorrect = false;
-          return;
-        }
-
-        selected.sort();
-        let correct = [...group.correct].sort();
-        if (JSON.stringify(selected) !== JSON.stringify(correct)) {
-          allCorrect = false;
-        }
-      });
-
-      if (allCorrect) {
-        if (q.next !== undefined) {
-          current = q.next;
-          loadQuestion(current);
-        } else if (q.imageLink) {
-          // Hiển thị ảnh kết quả ngay trên page
-          document.getElementById('quiz').style.display = 'none';
-          document.getElementById('hintButtonContainer').style.display = 'none';
-          document.getElementById('result-img').style.display = 'block';
-          document.getElementById('result-image').src = q.imageLink;
-        }
+    function checkAnswer() {
+      const selected = document.querySelector('input[name="answer"]:checked');
+      if (!selected) return alert("Vui lòng chọn một đáp án!");
+      const value = parseInt(selected.value);
+      if (question.correct.includes(value)) {
+        document.getElementById('quiz').style.display = 'none';
+        document.getElementById('result-img').style.display = 'block';
+        document.getElementById('result-image').src = question.resultImage;
       } else {
         document.getElementById('popup').style.display = 'flex';
       }
@@ -310,16 +295,20 @@
       document.getElementById('popup').style.display = 'none';
     }
 
-    // Popup gợi ý
     function openHint() {
-      document.getElementById('hintPopup').style.display = 'flex';
-    }
-    function closeHint() {
-      document.getElementById('hintPopup').style.display = 'none';
+      document.getElementById('hint-popup').style.display = 'flex';
     }
 
-    // Khởi tạo
-    loadQuestion(current);
+    function closeHint() {
+      document.getElementById('hint-popup').style.display = 'none';
+    }
+
+    window.onclick = function(e) {
+      const popup = document.getElementById('hint-popup');
+      if (e.target === popup) popup.style.display = 'none';
+    };
+
+    loadQuestion();
   </script>
 </body>
 </html>
