@@ -1490,37 +1490,34 @@
 
 
   <!-- ══════════════════════════════════════════════════
-       THÔNG BÁO LẦN ĐẦU TRUY CẬP (THÊM MỚI)
-       Chỉ hiện ở lần đầu vào web. Đổi link nút "Bức Thư Tay"
-       ở biến LETTER_URL trong thẻ <script> bên dưới.
+       THÔNG BÁO + LINK BỨC THƯ TAY (THÊM MỚI)
+       Hiện mỗi lần tải trang / F5.
+       ► THAY LINK Ở ĐÂY: sửa giá trị data-letter-url bên dưới
+         (giữ nguyên dấu ngoặc kép, nên bắt đầu bằng https://)
        ══════════════════════════════════════════════════ -->
-  <div class="intro-notice" id="introNotice">
+  <div class="intro-notice show" id="introNotice" data-letter-url="https://example.com">
     <div class="intro-notice-box">
       <div class="intro-notice-label">// Thông báo</div>
       <p class="intro-notice-text">Tại nhà của Long, cơ quan CSĐT phát hiện lá thư Khánh Huyền viết cho anh trai</p>
-      <a class="intro-notice-btn" id="introNoticeBtn" href="#" target="_blank" rel="noopener">Bức Thư Tay</a>
+      <a class="intro-notice-btn" id="introNoticeBtn" href="https://example.com" target="_blank" rel="noopener"
+         onclick="document.getElementById('introNotice').classList.remove('show')">Bức Thư Tay</a>
     </div>
   </div>
 
   <script>
     (function () {
-      // ══════════════════════════════════════════════════
-      // LINK BỨC THƯ TAY — THAY LINK CỦA BẠN Ở ĐÂY
-      var LETTER_URL = "https://raw.githubusercontent.com/designdaovn/Consotuthan_Nhiemvu3/refs/heads/main/3.5%20copy.jpg";
-      // ══════════════════════════════════════════════════
-      var notice = document.getElementById('introNotice');
-      var btn = document.getElementById('introNoticeBtn');
-      var fabLetter = document.getElementById('fabLetter');
-      btn.href = LETTER_URL;
-      fabLetter.href = LETTER_URL;
-
-      // Luôn hiện thông báo mỗi lần tải trang (kể cả khi F5)
-      notice.classList.add('show');
-
-      // Bấm nút → mở link ở tab mới và đóng thông báo
-      btn.addEventListener('click', function () {
-        notice.classList.remove('show');
-      });
+      try {
+        var notice = document.getElementById('introNotice');
+        var url = (notice.getAttribute('data-letter-url') || '').trim();
+        // Thiếu https:// thì tự thêm, tránh bị hiểu là link nội bộ (quay về trang chủ)
+        if (url && !/^(https?:)?\/\//i.test(url) && !/^(mailto|tel):/i.test(url)) {
+          url = 'https://' + url;
+        }
+        if (url) {
+          document.getElementById('introNoticeBtn').href = url;
+          document.getElementById('fabLetter').href = url;
+        }
+      } catch (e) { console.error(e); }
     })();
   </script>
 
@@ -1529,7 +1526,7 @@
        Link lấy từ biến LETTER_URL ở thẻ <script> phía trên
        ══════════════════════════════════════════════════ -->
   <div class="fab-group-left">
-    <a class="fab-item" id="fabLetter" href="#" target="_blank" rel="noopener" title="Bức Thư Tay">
+    <a class="fab-item" id="fabLetter" href="https://example.com" target="_blank" rel="noopener" title="Bức Thư Tay">
       <div class="fab-btn">
         <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
           <path class="icon-default" d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
