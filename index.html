@@ -1511,7 +1511,7 @@
         var url = (notice.getAttribute('data-letter-url') || '').trim();
         // Thiếu https:// thì tự thêm, tránh bị hiểu là link nội bộ (quay về trang chủ)
         if (url && !/^(https?:)?\/\//i.test(url) && !/^(mailto|tel):/i.test(url)) {
-          url = 'https://' + url;
+          url = 'https://raw.githubusercontent.com/designdaovn/Consotuthan_Nhiemvu3/refs/heads/main/3.5%20copy.jpg' + url;
         }
         if (url) {
           document.getElementById('introNoticeBtn').href = url;
