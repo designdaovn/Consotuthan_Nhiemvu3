@@ -918,6 +918,112 @@
         padding: 0 12px 0 10px;
       }
     }
+
+    /* ══════════ THÔNG BÁO LẦN ĐẦU TRUY CẬP (THÊM MỚI) ══════════ */
+    .intro-notice {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.9);
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      z-index: 10000;
+      backdrop-filter: blur(5px);
+      animation: fadeIn 0.4s ease;
+    }
+    .intro-notice.show { display: flex; }
+
+    .intro-notice-box {
+      position: relative;
+      width: 100%;
+      max-width: 460px;
+      background: var(--dark2);
+      border: 1px solid rgba(235,209,30,0.4);
+      padding: 34px 30px 30px;
+      text-align: center;
+      box-shadow: 0 0 60px rgba(235,209,30,0.1), 0 20px 60px rgba(0,0,0,0.8);
+      animation: fadeSlideIn 0.6s ease forwards;
+    }
+    .intro-notice-box::before, .intro-notice-box::after {
+      content: '';
+      position: absolute;
+      width: 18px; height: 18px;
+      border-color: var(--gold);
+      border-style: solid;
+    }
+    .intro-notice-box::before { top: 10px; left: 10px; border-width: 2px 0 0 2px; }
+    .intro-notice-box::after  { bottom: 10px; right: 10px; border-width: 0 2px 2px 0; }
+
+    .intro-notice-label {
+      font-family: 'Courier Prime', 'Courier New', monospace;
+      font-size: 10px;
+      letter-spacing: 4px;
+      color: var(--gold);
+      text-transform: uppercase;
+      opacity: 0.75;
+      margin-bottom: 16px;
+    }
+    .intro-notice-text {
+      font-family: 'Lora', Georgia, serif;
+      font-size: 17px;
+      line-height: 1.7;
+      color: var(--paper);
+      margin-bottom: 26px;
+    }
+    .intro-notice-btn {
+      display: inline-block;
+      font-family: 'Courier Prime', 'Courier New', monospace;
+      font-size: 13px;
+      font-weight: bold;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      text-decoration: none;
+      color: var(--dark);
+      background: var(--gold);
+      padding: 12px 28px;
+      border: none;
+      cursor: pointer;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .intro-notice-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(235,209,30,0.35);
+    }
+
+    /* ══════════ ICON LÁ THƯ GÓC DƯỚI TRÁI (THÊM MỚI) ══════════ */
+    .fab-group-left {
+      position: fixed;
+      bottom: 20px;
+      left: 20px;
+      z-index: 1000;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      align-items: flex-start;
+    }
+    .fab-group-left .fab-label { transform: translateX(-6px); }
+    .fab-group-left .fab-item:hover .fab-label { transform: translateX(0); }
+
+    @media (max-width: 500px) {
+      .fab-group-left { bottom: 14px; left: 14px; }
+      .intro-notice { padding: 14px; }
+      .intro-notice-box { padding: 28px 20px 24px; }
+      .intro-notice-text { font-size: 15px; margin-bottom: 22px; }
+      .intro-notice-btn { width: 100%; padding: 13px 16px; }
+    }
+    @media (max-width: 360px) {
+      .intro-notice-text { font-size: 14px; }
+    }
+    @media (max-height: 480px) and (orientation: landscape) {
+      .intro-notice { align-items: flex-start; overflow-y: auto; }
+      .intro-notice-box { margin: auto; padding: 20px; }
+      .intro-notice-text { margin-bottom: 16px; }
+    }
+    /* Cảm ứng: không có hover nên ẩn nhãn tooltip */
+    @media (pointer: coarse) {
+      .fab-group-left .fab-label { display: none; }
+    }
   </style>
 </head>
 <body>
@@ -1381,6 +1487,57 @@
 
   </div>
   <!-- ══════════════════════════════════════════════════ -->
+
+
+  <!-- ══════════════════════════════════════════════════
+       THÔNG BÁO LẦN ĐẦU TRUY CẬP (THÊM MỚI)
+       Chỉ hiện ở lần đầu vào web. Đổi link nút "Bức Thư Tay"
+       ở biến LETTER_URL trong thẻ <script> bên dưới.
+       ══════════════════════════════════════════════════ -->
+  <div class="intro-notice" id="introNotice">
+    <div class="intro-notice-box">
+      <div class="intro-notice-label">// Thông báo</div>
+      <p class="intro-notice-text">Tại nhà của Long, cơ quan CSĐT phát hiện lá thư Khánh Huyền viết cho anh trai</p>
+      <a class="intro-notice-btn" id="introNoticeBtn" href="#" target="_blank" rel="noopener">Bức Thư Tay</a>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      // ══════════════════════════════════════════════════
+      // LINK BỨC THƯ TAY — THAY LINK CỦA BẠN Ở ĐÂY
+      var LETTER_URL = "https://example.com";
+      // ══════════════════════════════════════════════════
+      var notice = document.getElementById('introNotice');
+      var btn = document.getElementById('introNoticeBtn');
+      var fabLetter = document.getElementById('fabLetter');
+      btn.href = LETTER_URL;
+      fabLetter.href = LETTER_URL;
+
+      // Luôn hiện thông báo mỗi lần tải trang (kể cả khi F5)
+      notice.classList.add('show');
+
+      // Bấm nút → mở link ở tab mới và đóng thông báo
+      btn.addEventListener('click', function () {
+        notice.classList.remove('show');
+      });
+    })();
+  </script>
+
+  <!-- ══════════════════════════════════════════════════
+       ICON LÁ THƯ — GÓC DƯỚI TRÁI (THÊM MỚI)
+       Link lấy từ biến LETTER_URL ở thẻ <script> phía trên
+       ══════════════════════════════════════════════════ -->
+  <div class="fab-group-left">
+    <a class="fab-item" id="fabLetter" href="#" target="_blank" rel="noopener" title="Bức Thư Tay">
+      <div class="fab-btn">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path class="icon-default" d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
+        </svg>
+      </div>
+      <span class="fab-label">BỨC THƯ TAY</span>
+    </a>
+  </div>
 
 </body>
 </html>
